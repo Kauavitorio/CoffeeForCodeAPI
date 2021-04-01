@@ -3,11 +3,14 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser')
 
+const ShoppingCart = require('./routes/shoppingcart')
+const CardRoute = require('./routes/cards')
 const ProductRoute = require('./routes/products')
 const CategoryRoute = require('./routes/category')
 const OrderRoute = require('./routes/orders')
 const userRoute = require('./routes/users')
 const ImagesRoute = require('./routes/images')
+const MobileRoute = require('./routes/mobile')
 
 app.use(morgan('dev'));
 app.use('/uploads', express.static('uploads'))
@@ -37,6 +40,9 @@ app.use('/category', CategoryRoute);
 app.use('/orders', OrderRoute);
 app.use('/images', ImagesRoute);
 app.use('/user', userRoute);
+app.use('/shoppingcart', ShoppingCart);
+app.use('/card', CardRoute);
+app.use('/mobile', MobileRoute);
 
 // Quando não encontra rota, entra aqui:
 app.use((req, res, next) => {

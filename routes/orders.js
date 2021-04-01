@@ -3,16 +3,15 @@ const router = express.Router();
 const OrdersControler = require('../controllers/orders-controller');
 
 // Retorna todos os pedidos
-router.get('/', OrdersControler.getOrders);
+router.get('/:email_user', OrdersControler.getOrders);
 
 // Insere um pedidos
-router.post('/', OrdersControler.postOrder);
+router.post('/insert/:email_user/:zipcode/:address_user/:complement/:PayFormat_user/:status', OrdersControler.postOrder);
 
-// Retona os dados de 1 pedido
-router.get('/:orderId', OrdersControler.getOrderDetail );
+router.patch('/update/:cd_order/:status', OrdersControler.patchOrderStatus)
 
 //  Exclui um pedido
-router.delete('/:orderId', OrdersControler.deleteOrder);
+router.get('/cd/:cd_order', OrdersControler.getOrderByCd);
 
 
 module.exports = router;

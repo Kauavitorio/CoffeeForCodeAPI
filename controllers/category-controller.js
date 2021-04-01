@@ -7,12 +7,16 @@ exports.getCategory = async (req, res, next ) => {
     if (results.length < 1) {
         return res.status(204).send({ message: 'No Category registerd' })
     }else{
-        return res.status(200).send(results.map(cat => {
-            return {
-                cd_cat: cat.cd_cat,
-                nm_cat: cat.nm_cat
-            }
-        }))
+        const response = {
+            Search: results.map(cat => {
+                return {
+                    cd_cat: cat.cd_cat,
+                    nm_cat: cat.nm_cat,
+                    img_cat: process.env.URL_API + cat.img_cat
+                }
+            })
+        }
+        return res.status(200).send(response)
     }
     
     } catch (error) {
@@ -22,12 +26,20 @@ exports.getCategory = async (req, res, next ) => {
 
 exports.postCategory = async (req, res, next ) => {
     try {
-    const query = 'INSERT INTO tbl_category(nm_cat) VALUES (?)'
-    const result = await mysql.execute(query, [ req.params.nm_cat ])
-    return res.status(201).send({
-        cd_cat: result.insertId,
-        nm_cat: req.params.nm_cat
-    });
+        var queryProd = `SELECT * FROM tbl_category WHERE nm_cat = ?`;
+        var resultProd = await mysql.execute(queryProd, [req.params.nm_cat]);
+
+        if (resultProd.length > 0) {
+            return res.status(409).send({ message: 'Category is already inserte' + 'But Image was insert .-.' })
+        }else{
+            const query = 'INSERT INTO tbl_category(nm_cat, img_cat) VALUES (?,?)'
+            const result = await mysql.execute(query, [ req.params.nm_cat, req.file.path ])
+            return res.status(201).send({
+                cd_cat: result.insertId,
+                nm_cat: req.params.nm_cat,
+                img_cat: process.env.URL_API + req.file.path
+            });
+        }
     } catch (error) {
         return res.status(500).send({error: error})
     }
@@ -43,5 +55,27 @@ exports.updateCategory = async (req, res, next) => {
         });
     } catch (error) {
         return res.status(500).send({ error: error });        
+    }
+};
+
+
+// ---------------- Sistem --------------------------------\\
+exports.getCategorySistem = async (req, res, next ) => {
+    try {
+    const results = await mysql.execute('SELECT * FROM tbl_category;')
+    if (results.length < 1) {
+        return res.status(204).send({ message: 'No Category registerd' })
+    }else{
+        return res.status(200).send(results.map(cat => {
+            return {
+                cd_cat: cat.cd_cat,
+                nm_cat: cat.nm_cat,
+                img_cat: process.env.URL_API + cat.img_cat
+            }
+        }))
+    }
+    
+    } catch (error) {
+        return res.status(500).send({error: error})
     }
 };
